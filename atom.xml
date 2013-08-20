@@ -4,7 +4,7 @@
   <title><![CDATA[Joy's Blog]]></title>
   <link href="http://huyong36.github.io/atom.xml" rel="self"/>
   <link href="http://huyong36.github.io/"/>
-  <updated>2013-08-20T11:10:56+08:00</updated>
+  <updated>2013-08-20T17:45:52+08:00</updated>
   <id>http://huyong36.github.io/</id>
   <author>
     <name><![CDATA[Joy Hu]]></name>
@@ -12,6 +12,68 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby正则在表达式中的应用]]></title>
+    <link href="http://huyong36.github.io/blog/2013/08/20/use-ruby-reg-to-match-expression/"/>
+    <updated>2013-08-20T16:33:00+08:00</updated>
+    <id>http://huyong36.github.io/blog/2013/08/20/use-ruby-reg-to-match-expression</id>
+    <content type="html"><![CDATA[<p>在写24点纸牌算法时，有一个情况：</p>
+
+<blockquote><p>算法得到的表达式都是基本表达式，没有考虑运算符号之间的关系，导致冗余了括号。</p>
+
+<p>例如：(3 * (1 * 2) * 4) 与 (3 * (1 * 2 * 4))其实是一样的表达式，应该进行优化。</p></blockquote>
+
+<p>优化的步骤分为：</p>
+
+<ul>
+<li>分析表达式</li>
+<li>统一乘法两边的大小顺序</li>
+<li>移除乘除运算外面的括号</li>
+</ul>
+
+
+<p>分析一般表达式的构成，大致可以简化为 表达式E = (左括号left_bracket) + (表达式或数字E0) + (运算符operation) ＋ (表达式或数字E1) (右括号right_bracket)。
+参考<a href="https://speakerdeck.com/luikore/more-than-regexp">超越正则的正则表达式</a>, 表达式的正则可以表示为：</p>
+
+<figure class='code'><figcaption><span>表达式的正则</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">/(?&lt;expression&gt;\((?&lt;left&gt;(\g&lt;expression&gt;|\d*))(?&lt;operate&gt;[\+\-\*\/])(?&lt;right&gt;(\g&lt;expression&gt;|\d*))\))/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个正则可以匹配类似(1+2)、((1+2)*(3+4))这种表达式，如果想匹配没有括号包围的表达式如：1+2,应该再加上去除()的正则。</p>
+
+<figure class='code'><figcaption><span>更完善的正则</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">/(?&lt;expression&gt;[\((?&lt;left&gt;(\g&lt;expression&gt;|\d*))(?&lt;operate&gt;[\+\-\*\/])(?&lt;right&gt;(\g&lt;expression&gt;|\d*))\) (?&lt;left&gt;(\g&lt;expression&gt;|\d*))(?&lt;operate&gt;[\+\-\*\/])(?&lt;right&gt;(\g&lt;expression&gt;|\d*))])/</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接下来，就是给乘法两边排序。不需要顾虑那么多，直接正则匹配到包含(E0*E1)的子表达式，进行排序替换。</p>
+
+<figure class='code'><figcaption><span>排序替换</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">exp</span> <span class="o">=</span> <span class="s2">&quot;(2*3)+5&quot;</span>
+</span><span class='line'><span class="k">if</span> <span class="sr">/(?&lt;all_exp&gt;\((?&lt;left_number&gt;((?&lt;expression_left&gt;\(?(\d*)[\+\-\*\/](\d*|\g&lt;expression_left&gt;)\)?)|\d*))\*(?&lt;right_number&gt;((?&lt;expression_right&gt;\(?(\d*)[\+\-\*\/](\d*|\g&lt;expression_right&gt;)\)?)|\d*))\))/</span> <span class="o">=~</span> <span class="n">exp</span>
+</span><span class='line'>  <span class="n">left_number</span><span class="p">,</span> <span class="n">right_number</span> <span class="o">=</span> <span class="n">right_number</span><span class="p">,</span> <span class="n">left_number</span> <span class="k">if</span> <span class="n">left_number</span> <span class="o">=~</span> <span class="sr">/^\d*$/</span> <span class="o">&amp;&amp;</span> <span class="n">right_number</span> <span class="o">=~</span> <span class="sr">/^\d*$/</span> <span class="o">&amp;&amp;</span> <span class="n">left_number</span><span class="o">.</span><span class="n">to_i</span> <span class="o">&lt;</span> <span class="n">right_number</span><span class="o">.</span><span class="n">to_i</span>
+</span><span class='line'>  <span class="n">s_exp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">left_number</span><span class="si">}</span><span class="s2">*</span><span class="si">#{</span><span class="n">right_number</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>  <span class="n">exp</span><span class="o">.</span><span class="n">gsub!</span><span class="p">(</span><span class="n">all_exp</span><span class="p">,</span> <span class="n">s_exp</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">exp</span> <span class="c1">#=&gt; &quot;3*2+5&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后的结果就成功的把乘法外面的括号移掉了，并按照左大右小的顺序排序。</p>
+
+<p>除法的方式比乘法要简单一些,就不列举了。</p>
+
+<p>还有一个类似(1+(2+3))以及((2+3)-2)这种也应该去括号，这样的话得到的表达式就能够去除大部分相同的表达式，从而实现最优。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[卸载默认rake版本]]></title>
