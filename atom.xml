@@ -1,16 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
+  <title><![CDATA[Joy's Blog]]></title>
   <link href="http://huyong36.github.io/atom.xml" rel="self"/>
   <link href="http://huyong36.github.io/"/>
-  <updated>2013-04-27T11:20:28+08:00</updated>
+  <updated>2013-08-20T11:10:56+08:00</updated>
   <id>http://huyong36.github.io/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[Joy Hu]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[卸载默认rake版本]]></title>
+    <link href="http://huyong36.github.io/blog/2013/08/09/resolve-uninstall-bundler-error/"/>
+    <updated>2013-08-09T11:00:00+08:00</updated>
+    <id>http://huyong36.github.io/blog/2013/08/09/resolve-uninstall-bundler-error</id>
+    <content type="html"><![CDATA[<p>重装系统和rvm后,ruby版本1.9.1,rake版本10.0.4.使用rake会爆出error:</p>
+
+<figure class='code'><figcaption><span>rake error</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="ss">ERROR</span><span class="p">:</span> <span class="s1">&#39;rake/rdoctask&#39;</span> <span class="n">is</span> <span class="n">obsolete</span> <span class="ow">and</span> <span class="n">no</span> <span class="n">longer</span> <span class="n">supported</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里的原因在于rvm自动安装的rake版本过高,尝试安装0.9版本的,并卸载默认版本。</p>
+
+<figure class='code'><figcaption><span>uninstall rake</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="n">uninstall</span> <span class="n">rake</span> <span class="o">-</span><span class="n">v</span><span class="o">=</span><span class="mi">10</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">4</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>还是有error爆出:</p>
+
+<figure class='code'><figcaption><span>uninstall error</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="ss">ERROR</span><span class="p">:</span>  <span class="no">While</span> <span class="n">executing</span> <span class="n">gem</span> <span class="o">.</span><span class="n">.</span><span class="o">.</span> <span class="p">(</span><span class="ss">Gem</span><span class="p">:</span><span class="ss">:InstallError</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">cannot</span> <span class="n">uninstall</span><span class="p">,</span> <span class="n">check</span> <span class="sb">`gem list -d`</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>查看gem uninstall 帮助后，找到了解决方案:</p>
+
+<figure class='code'><figcaption><span>help</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span> <span class="n">help</span> <span class="n">uninstall</span>
+</span><span class='line'><span class="o">&gt;&gt;</span><span class="ss">Defaults</span><span class="p">:</span>
+</span><span class='line'><span class="o">&gt;&gt;</span>    <span class="o">--</span><span class="n">version</span> <span class="s1">&#39;&gt;= 0&#39;</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">force</span> <span class="o">--</span><span class="n">install</span><span class="o">-</span><span class="n">dir</span> <span class="sr">/Users/xxx</span><span class="o">/.</span><span class="n">rvm</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">ruby</span><span class="o">-</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="n">p431</span>
+</span><span class='line'><span class="n">gem</span> <span class="n">list</span> <span class="n">rake</span> <span class="o">-</span><span class="n">d</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">rake</span> <span class="p">(</span><span class="mi">10</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>    <span class="ss">Author</span><span class="p">:</span> <span class="no">Jim</span> <span class="no">Weirich</span>
+</span><span class='line'>    <span class="ss">Rubyforge</span><span class="p">:</span> <span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="n">rubyforge</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">rake</span>
+</span><span class='line'>    <span class="ss">Homepage</span><span class="p">:</span> <span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="n">rake</span><span class="o">.</span><span class="n">rubyforge</span><span class="o">.</span><span class="n">org</span>
+</span><span class='line'>    <span class="ss">License</span><span class="p">:</span> <span class="no">MIT</span>
+</span><span class='line'>    <span class="no">Installed</span> <span class="n">at</span> <span class="p">(</span><span class="mi">10</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">4</span><span class="p">):</span> <span class="sr">/Users/xxx</span><span class="o">/.</span><span class="n">rvm</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">ruby</span><span class="o">-</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="n">p431</span><span class="vi">@global</span>
+</span><span class='line'>                 <span class="p">(</span><span class="mi">0</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">2</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="sr">/Users/xxx</span><span class="o">/.</span><span class="n">rvm</span><span class="o">/</span><span class="n">gems</span><span class="o">/</span><span class="n">ruby</span><span class="o">-</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="n">p431</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以看到rake安装在两个不同的目录下，但默认uninstall的路径是在没有global的gem里。所以要卸载默认rake需要带上参数-i /Users/xxx/.rvm/gems/ruby-1.9.1-p431@global或者&#8211;install-dir /Users/xxx/.rvm/gems/ruby-1.9.1-p431@global</p>
+]]></content>
+  </entry>
   
 </feed>
