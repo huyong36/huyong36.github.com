@@ -87,6 +87,8 @@
 
 <time datetime="2013-08-20T16:33:00+08:00" pubdate data-updated="true">Aug 20<span>th</span>, 2013</time>
         
+         | <a href="#disqus_thread">Comments</a>
+        
       </p>
     
   </header>
@@ -111,14 +113,34 @@
 参考<a href="https://speakerdeck.com/luikore/more-than-regexp">超越正则的正则表达式</a>, 表达式的正则可以表示为：</p>
 
 <figure class='code'><figcaption><span>表达式的正则</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">/(?&lt;expression&gt;\((?&lt;left&gt;(\g&lt;expression&gt;|\d*))(?&lt;operate&gt;[\+\-\*\/])(?&lt;right&gt;(\g&lt;expression&gt;|\d*))\))/</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">/(?&lt;expression&gt;\(</span>
+</span><span class='line'><span class="sr"> (?&lt;left&gt;(\g&lt;expression&gt;|\d*))</span>
+</span><span class='line'><span class="sr"> (?&lt;operate&gt;[\+\-\*\/])</span>
+</span><span class='line'><span class="sr"> (?&lt;right&gt;(\g&lt;expression&gt;|\d*))</span>
+</span><span class='line'><span class="sr"> \))/</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>这个正则可以匹配类似(1+2)、((1+2)*(3+4))这种表达式，如果想匹配没有括号包围的表达式如：1+2,应该再加上去除()的正则。</p>
 
 <figure class='code'><figcaption><span>更完善的正则</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">/(?&lt;expression&gt;[\((?&lt;left&gt;(\g&lt;expression&gt;|\d*))(?&lt;operate&gt;[\+\-\*\/])(?&lt;right&gt;(\g&lt;expression&gt;|\d*))\) (?&lt;left&gt;(\g&lt;expression&gt;|\d*))(?&lt;operate&gt;[\+\-\*\/])(?&lt;right&gt;(\g&lt;expression&gt;|\d*))])/</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">/(?&lt;expression&gt;</span>
+</span><span class='line'><span class="sr"> [\((?&lt;left&gt;(\g&lt;expression&gt;|\d*))</span>
+</span><span class='line'><span class="sr">     (?&lt;operate&gt;[\+\-\*\/])</span>
+</span><span class='line'><span class="sr">     (?&lt;right&gt;(\g&lt;expression&gt;|\d*))\) </span>
+</span><span class='line'><span class="sr">     (?&lt;left&gt;(\g&lt;expression&gt;|\d*))</span>
+</span><span class='line'><span class="sr">     (?&lt;operate&gt;[\+\-\*\/])</span>
+</span><span class='line'><span class="sr">     (?&lt;right&gt;(\g&lt;expression&gt;|\d*))])/</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -131,8 +153,14 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">exp</span> <span class="o">=</span> <span class="s2">&quot;(2*3)+5&quot;</span>
-</span><span class='line'><span class="k">if</span> <span class="sr">/(?&lt;all_exp&gt;\((?&lt;left_number&gt;((?&lt;expression_left&gt;\(?(\d*)[\+\-\*\/](\d*|\g&lt;expression_left&gt;)\)?)|\d*))\*(?&lt;right_number&gt;((?&lt;expression_right&gt;\(?(\d*)[\+\-\*\/](\d*|\g&lt;expression_right&gt;)\)?)|\d*))\))/</span> <span class="o">=~</span> <span class="n">exp</span>
+</span><span class='line'><span class="k">if</span> <span class="sr">/(?&lt;all_exp&gt;</span>
+</span><span class='line'><span class="sr"> \((?&lt;left_number&gt;((?&lt;expression_left&gt;\(?(\d*)[\+\-\*\/](\d*|\g&lt;expression_left&gt;)\)?)|\d*))</span>
+</span><span class='line'><span class="sr"> \*</span>
+</span><span class='line'><span class="sr"> (?&lt;right_number&gt;((?&lt;expression_right&gt;\(?(\d*)[\+\-\*\/](\d*|\g&lt;expression_right&gt;)\)?)|\d*))\))/</span> <span class="o">=~</span> <span class="n">exp</span>
 </span><span class='line'>  <span class="n">left_number</span><span class="p">,</span> <span class="n">right_number</span> <span class="o">=</span> <span class="n">right_number</span><span class="p">,</span> <span class="n">left_number</span> <span class="k">if</span> <span class="n">left_number</span> <span class="o">=~</span> <span class="sr">/^\d*$/</span> <span class="o">&amp;&amp;</span> <span class="n">right_number</span> <span class="o">=~</span> <span class="sr">/^\d*$/</span> <span class="o">&amp;&amp;</span> <span class="n">left_number</span><span class="o">.</span><span class="n">to_i</span> <span class="o">&lt;</span> <span class="n">right_number</span><span class="o">.</span><span class="n">to_i</span>
 </span><span class='line'>  <span class="n">s_exp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">left_number</span><span class="si">}</span><span class="s2">*</span><span class="si">#{</span><span class="n">right_number</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span class='line'>  <span class="n">exp</span><span class="o">.</span><span class="n">gsub!</span><span class="p">(</span><span class="n">all_exp</span><span class="p">,</span> <span class="n">s_exp</span><span class="p">)</span>
@@ -191,6 +219,12 @@
     </p>
   </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -257,6 +291,22 @@
 
 </footer>
   
+
+<script type="text/javascript">
+      var disqus_shortname = 'joyhu';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://huyong36.github.io/blog/2013/08/20/use-ruby-reg-to-match-expression/';
+        var disqus_url = 'http://huyong36.github.io/blog/2013/08/20/use-ruby-reg-to-match-expression/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
