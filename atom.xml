@@ -4,7 +4,7 @@
   <title><![CDATA[Joy's Blog]]></title>
   <link href="http://huyong36.github.io/atom.xml" rel="self"/>
   <link href="http://huyong36.github.io/"/>
-  <updated>2013-09-17T14:29:48+08:00</updated>
+  <updated>2013-08-30T17:24:25+08:00</updated>
   <id>http://huyong36.github.io/</id>
   <author>
     <name><![CDATA[Joy Hu]]></name>
@@ -12,75 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[rails生成zip文件并发送到客户端]]></title>
-    <link href="http://huyong36.github.io/blog/2013/09/17/use-zip-gem-to-generate-zip-file-and-send-to-the-client/"/>
-    <updated>2013-09-17T11:13:00+08:00</updated>
-    <id>http://huyong36.github.io/blog/2013/09/17/use-zip-gem-to-generate-zip-file-and-send-to-the-client</id>
-    <content type="html"><![CDATA[<pre><code>根据客户端传来的数据，使用zip gem动态生成zip文件并发送给客户端。
-</code></pre>
-
-<p>  运行环境ruby1.9.1,rails2.3.8.
-  首先安装gem包:
-  <code>
-  gem install rubyzip -v 0.9.9
- </code></p>
-
-<p>  在项目中引入:
-  <code>
-  require "zip"
- </code>
-  使用的是
-  <code>Zip::ZipOutputStream</code>这个类。
-  具体实现过程:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">t</span> <span class="o">=</span> <span class="no">Tempfile</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">Time</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m%d%H%M%S&quot;</span><span class="p">))</span><span class="c1">#创建tempfile</span>
-</span><span class='line'>  <span class="c1"># Give the path of the temp file to the zip outputstream, it won&#39;t try to open it as an archive.</span>
-</span><span class='line'>  <span class="ss">Zip</span><span class="p">:</span><span class="ss">:ZipOutputStream</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">zos</span><span class="o">|</span>
-</span><span class='line'>    <span class="n">zos</span><span class="o">.</span><span class="n">put_next_entry</span><span class="p">(</span><span class="s2">&quot;index.txt&quot;</span><span class="p">)</span><span class="c1">#新建index.txt</span>
-</span><span class='line'>    <span class="n">zos</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;This is index text file.</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="c1">#往index.txt写入数据</span>
-</span><span class='line'>    <span class="n">zos</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>    <span class="n">zos</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;This zip include 30 files.File name list:</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>    <span class="mi">30</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
-</span><span class='line'>      <span class="n">zos</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">e</span><span class="si">}</span><span class="s2">.txt</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>    <span class="mi">30</span><span class="o">.</span><span class="n">collect</span> <span class="k">do</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span>
-</span><span class='line'>      <span class="n">zos</span><span class="o">.</span><span class="n">put_next_entry</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">e</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">zos</span><span class="o">.</span><span class="n">puts</span> <span class="s2">&quot;text file.</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span><span class="c1">#生成zip</span>
-</span><span class='line'>  <span class="n">send_file</span> <span class="n">t</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">,</span> <span class="ss">:disposition</span> <span class="o">=&gt;</span> <span class="s1">&#39;attachment&#39;</span><span class="p">,</span> <span class="ss">:filename</span> <span class="o">=&gt;</span> <span class="s2">&quot;downloadzip.zip&quot;</span><span class="c1">#发送到客户端</span>
-</span><span class='line'>  <span class="n">t</span><span class="o">.</span><span class="n">close</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>  <code>put_next_entry</code>方法是新建一个新文件，接下来的
-  <code>puts</code>为这个文件写入数据，包括图片也可以。直到下一个
-  <code>put_next_entry</code>。
-  notice:
-  0.9.7的
-  <code>print</code>方法和0.9.9有差异，不会识别\r\n换行。建议用
-  <code>puts</code>。</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Ruby正则在表达式中的应用]]></title>
